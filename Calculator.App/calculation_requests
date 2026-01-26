@@ -1,0 +1,1 @@
+public record CalculationRequest(int A, int B, Calculator Operation);
