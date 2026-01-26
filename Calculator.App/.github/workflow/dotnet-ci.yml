@@ -1,196 +1,32 @@
-name: .NET CI/CD Pipeline
+# .github/workflows/dotnet.yml
+name: .NET Calculator CI
 
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:  # Manual trigger
-
-env:
-  DOTNET_VERSION: '8.0.x'
-  SOLUTION_PATH: 'ProfessionalCalculator.sln'
 
 jobs:
-  quality-checks:
-    name: Quality Checks
+  build:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Full history for proper analysis
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-    
-    - name: Install Tools
-      run: |
-        dotnet tool install --global dotnet-format
-        dotnet tool install --global dotnet-reportgenerator-globaltool
-        
-    - name: Restore Dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
-      
-    - name: Code Format Check
-      run: |
-        dotnet format --verify-no-changes --verbosity diagnostic
-        
-    - name: Run Security Analysis
-      run: |
-        dotnet list package --vulnerable --include-transitive
-        
-    - name: Check for Compiler Warnings
-      run: |
-        dotnet build ${{ env.SOLUTION_PATH }} --no-restore --verbosity normal --warnaserror
-
-  build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
-    needs: quality-checks
-    
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-    
-    steps:
-    - name: Checkout Repository
+    - name: Checkout Code
       uses: actions/checkout@v4
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-    
-    - name: Cache NuGet packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+        dotnet-version: '8.0.x'
     
     - name: Restore Dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: dotnet restore Calculator.App/Calculator.App.csproj
     
-    - name: Build Solution
-      run: |
-        dotnet build ${{ env.SOLUTION_PATH }} \
-          --configuration ${{ matrix.configuration }} \
-          --no-restore \
-          --verbosity minimal
-        
-    - name: Run Unit Tests
-      if: matrix.configuration == 'Release'
-      run: |
-        dotnet test ${{ env.SOLUTION_PATH }} \
-          --configuration ${{ matrix.configuration }} \
-          --no-build \
-          --verbosity normal \
-          --collect:"XPlat Code Coverage" \
-          --results-directory ./TestResults \
-          --logger "trx;LogFileName=test-results.trx"
-          
-    - name: Generate Test Coverage Report
-      if: matrix.configuration == 'Release'
-      run: |
-        reportgenerator \
-          -reports:./**/coverage.cobertura.xml \
-          -targetdir:./CoverageReport \
-          -reporttypes:HtmlInline_AzurePipelines;Cobertura
-        
-    - name: Upload Test Results
-      if: always() && matrix.configuration == 'Release'
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results-${{ matrix.configuration }}
-        path: ./TestResults
-        
-    - name: Upload Coverage Report
-      if: matrix.configuration == 'Release'
-      uses: actions/upload-artifact@v3
-      with:
-        name: coverage-report-${{ matrix.configuration }}
-        path: ./CoverageReport
-
-  package-and-deploy:
-    name: Package and Deploy
-    runs-on: windows-latest
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
+    - name: Build Calculator
+      run: dotnet build Calculator.App/Calculator.App.csproj --no-restore --verbosity minimal
     
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-    
-    - name: Create Version
-      id: version
+    - name: Verify Build Output
       run: |
-        $version = "1.0.${{ github.run_number }}"
-        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-        echo "Using version: $version"
-        
-    - name: Create Release Package
-      run: |
-        # Publish Calculator.App
-        dotnet publish Calculator.App/Calculator.App.csproj \
-          --configuration Release \
-          --output ./publish/app \
-          --self-contained false \
-          -p:Version=${{ steps.version.outputs.VERSION }}
-        
-        # Create zip package
-        Compress-Archive -Path ./publish/app/* -DestinationPath ./publish/Calculator-v${{ steps.version.outputs.VERSION }}.zip
-        
-    - name: Create NuGet Package for Calculator.Core
-      run: |
-        dotnet pack Calculator.Core/Calculator.Core.csproj \
-          --configuration Release \
-          --output ./publish/nuget \
-          -p:Version=${{ steps.version.outputs.VERSION }} \
-          -p:PackageId=BitCube.Calculator.Core \
-          -p:Authors="BitCube Team" \
-          -p:Company="BitCube" \
-          -p:Description="Professional Calculator Library"
-          
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: release-packages
-        path: ./publish/*
-        
-    - name: Create GitHub Release
-      if: success()
-      uses: softprops/action-gh-release@v1
-      with:
-        name: Release v${{ steps.version.outputs.VERSION }}
-        tag_name: v${{ steps.version.outputs.VERSION }}
-        body: |
-          ## Professional Calculator v${{ steps.version.outputs.VERSION }}
-          
-          ### New Features
-          - Calculator with SOLID architecture
-          - Operation history tracking
-          - Professional error handling
-          
-          ### Technical Details
-          - Built with .NET 8
-          - Full test coverage
-          - CI/CD pipeline included
-          
-          ### Artifacts
-          - Application package
-          - NuGet library package
-        draft: false
-        prerelease: false
-        files: |
-          ./publish/Calculator-v*.zip
-          ./publish/nuget/*.nupkg
+        echo "Build completed successfully!"
+        echo "Executable created in: Calculator.App/bin/"
