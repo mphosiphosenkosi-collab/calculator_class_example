@@ -53,4 +53,5 @@ public class Calculator
             
         return _history.Last();
     }
+    
 }
