@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>CalculatorClassExample</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include all our folders -->
+    <Compile Include="Domain\**\*.cs" />
+    <Compile Include="Logic\**\*.cs" />
+    <Compile Include="Data\**\*.cs" />
+    <Compile Include="Persistence\**\*.cs" />
+  </ItemGroup>
+</Project>
