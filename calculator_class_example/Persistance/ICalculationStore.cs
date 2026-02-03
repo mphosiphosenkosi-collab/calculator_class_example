@@ -1,6 +1,6 @@
-using CalculatorDomainDemo.Domain;
+using Calculator_Class_Example.Domain;
 
-namespace CalculatorDomainDemo.Persistence
+namespace Calculator_Class_Example.Persistence
 {
     public interface ICalculationStore
     {
