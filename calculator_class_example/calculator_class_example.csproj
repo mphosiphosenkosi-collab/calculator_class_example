@@ -1,9 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Calculator_Class_Example</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- NO ProjectReference here - this is a class library -->
+    <!-- It should NOT reference any other projects in your solution -->
+  </ItemGroup>
 </Project>

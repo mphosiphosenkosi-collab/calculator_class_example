@@ -1,26 +1,63 @@
-using calculator_class_example.Domain;
-using calculator_class_example.Logic;
 using Microsoft.AspNetCore.Mvc;
+using Calculator_Class_Example.Domain;
+using Calculator_Class_Example.Logic;
+using Calculator_Class_Example.Persistence;
 
-namespace API.AddControllers
+namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[calculations]")]
-    public class CalculationsController : ControllerBase
+    [Route("api/[controller]")]
+    public class CalculationController : ControllerBase
     {
-        private readonly CalculatorService _calculatorService;
+        private readonly CalculationService _calculationService;
 
-        public CalculationController(CalculatorService calculatorService)
+        public CalculationController(CalculationService calculationService)
         {
-            _calculatorService = calculatorService;
+            _calculationService = calculationService;
         }
 
-        [HttpGet] // GET api/calculations
-        public async Task<IActionResult> GetAll()
+        [HttpPost("calculate")]
+        public async Task<ActionResult<Calculation>> Calculate([FromBody] CalculationRequest request)
         {
-            var calculations = await _calculatorService.GetAllAsync();
+            try
+            {
+                var calculation = await _calculationService.CalculateAsync(request);
+                return Ok(calculation);
+            }
+            catch (DivideByZeroException ex)
+            {
+                return BadRequest(new { error = "Cannot divide by zero" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
-        // Additional endpoints for subtract, multiply, divide can be added similarly
+        [HttpGet("history")]
+        public async Task<ActionResult<IEnumerable<Calculation>>> GetHistory()
+        {
+            var history = await _calculationService.GetHistoryAsync();
+            return Ok(history);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Calculation>> GetCalculation(Guid id)
+        {
+            var history = await _calculationService.GetHistoryAsync();
+            var calculation = history.FirstOrDefault(c => c.Id == id);
+            
+            if (calculation == null)
+                return NotFound();
+            
+            return Ok(calculation);
+        }
+
+        [HttpDelete("clear")]
+        public async Task<IActionResult> ClearHistory()
+        {
+            await _calculationService.ClearHistoryAsync();
+            return NoContent();
+        }
     }
 }

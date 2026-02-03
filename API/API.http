@@ -1,6 +1,31 @@
-@API_HostAddress = http://localhost:5105
+@Calculator_HostAddress = http://localhost:5208
+@ContentType = application/json
 
-GET {{API_HostAddress}}/weatherforecast/
-Accept: application/json
+### Perform addition calculation
+POST {{Calculator_HostAddress}}/api/calculation/calculate
+Content-Type: {{ContentType}}
 
-###
+{
+  "left": 10,
+  "right": 5,
+  "operation": 0
+}
+
+### Perform subtraction calculation
+POST {{Calculator_HostAddress}}/api/calculation/calculate
+Content-Type: {{ContentType}}
+
+{
+  "left": 20,
+  "right": 8,
+  "operation": 1
+}
+
+### Get all calculation history
+GET {{Calculator_HostAddress}}/api/calculation/history
+
+### Get specific calculation by ID
+GET {{Calculator_HostAddress}}/api/calculation/{id}
+
+### Clear calculation history
+DELETE {{Calculator_HostAddress}}/api/calculation/clear
