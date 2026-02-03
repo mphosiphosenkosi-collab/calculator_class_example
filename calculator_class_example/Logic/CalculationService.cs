@@ -38,9 +38,20 @@ namespace CalculatorDomain.Logic
             return calculation;
         }
 
-        public Task<IReadOnlyList<Calculation>> GetAllAsync()
+        public async Task<IReadOnlyList<Calculation>> LoadAllAsync()
         {
-            return _store.LoadAllAsync();
+            if (!File.Exists(_filePath))
+                return new List<Calculation>();
+
+            string json = await File.ReadAllTextAsync(_filePath);
+
+            if (string.IsNullOrWhiteSpace(json))
+                return new List<Calculation>();
+
+            List<Calculation> calculations = JsonSerializer.Deserialize<List<Calculation>>(json)
+            ?? new List<Calculation>();
+
+            return calculations;
         }
     }
 }
