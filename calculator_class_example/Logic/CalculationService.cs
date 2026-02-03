@@ -1,46 +1,39 @@
-using Calculator_Class_Example;
 using Calculator_Class_Example.Domain;
 using Calculator_Class_Example.Persistence;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace CalculatorDomain.Logic
+namespace Calculator_Class_Example.Logic
 {
-    public class CalculatorService
+    public class CalculationService
     {
         private readonly ICalculationStore _store;
 
-        public CalculatorService(ICalculationStore store)
+        public CalculationService(ICalculationStore store)
         {
             _store = store;
         }
 
-        public async Task<Calculation> CalculateAsync(CalculationRequest request)
+        public async Task<Calculation> CalculateAsync(double left, double right, OperationType operation)
         {
-            if (request.Operation == OperationType.Divide && request.right == 0)
-                throw new InvalidOperationException("Division by zero is not allowed.");
-
-            double result = request.Operation switch
+            double result = operation switch
             {
-                OperationType.Add => request.left + request.right,
-                OperationType.Subtract => request.left - request.right,
-                OperationType.Multiply => request.left * request.right,
-                OperationType.Divide => request.left / request.right,
-                _ => throw new InvalidOperationException("Unsupported operation.")
+                OperationType.Add => left + right,
+                OperationType.Subtract => left - right,
+                OperationType.Multiply => left * right,
+                OperationType.Divide => right != 0 ? left / right : throw new DivideByZeroException("Cannot divide by zero"),
+                _ => throw new ArgumentOutOfRangeException(nameof(operation))
             };
 
-            var calculation = new Calculation(
-                request.left,
-                request.right,
-                request.Operation,
-                result);
-
+            var calculation = new Calculation(left, right, operation, result);
             await _store.SaveAsync(calculation);
-
             return calculation;
         }
 
-        public Task<IReadOnlyList<Calculation>> GetAllAsync()
+        public async Task<List<Calculation>> GetHistoryAsync()
         {
-            return _store.LoadAllAsync();
+            var history = await _store.LoadAllAsync();
+            return history.ToList();
         }
     }
 }
