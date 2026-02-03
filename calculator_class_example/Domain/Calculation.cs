@@ -3,7 +3,7 @@ namespace Calculator_Class_Example.Domain
 {
     public class Calculation
     {
-        public Guid Id { get; }
+          public Guid Id { get; }
         public double Left { get; }
         public double Right { get; }
         public OperationType Operation { get; }

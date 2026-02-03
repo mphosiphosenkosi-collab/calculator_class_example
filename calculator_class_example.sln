@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{1A8F38B3-08FE-447B-8149-CF083FDFF0F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculatorDomainDemo", "CalculatorDomainDemo\CalculatorDomainDemo.csproj", "{68E92E6E-DA86-4C12-A9CD-7664E1A4BAF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{BC89030A-4194-44F9-984E-C62398E8B999}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +16,13 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1A8F38B3-08FE-447B-8149-CF083FDFF0F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A8F38B3-08FE-447B-8149-CF083FDFF0F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A8F38B3-08FE-447B-8149-CF083FDFF0F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A8F38B3-08FE-447B-8149-CF083FDFF0F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68E92E6E-DA86-4C12-A9CD-7664E1A4BAF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68E92E6E-DA86-4C12-A9CD-7664E1A4BAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68E92E6E-DA86-4C12-A9CD-7664E1A4BAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68E92E6E-DA86-4C12-A9CD-7664E1A4BAF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC89030A-4194-44F9-984E-C62398E8B999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC89030A-4194-44F9-984E-C62398E8B999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC89030A-4194-44F9-984E-C62398E8B999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC89030A-4194-44F9-984E-C62398E8B999}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
