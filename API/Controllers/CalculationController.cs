@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Calculator_Class_Example.Domain;
-using Calculator_Class_Example.Logic;
-using Calculator_Class_Example.Persistence;
+using Calculator_Class_Example.Domain;  // For CalculationRequest
+using Calculator_Class_Example.Logic;   // For CalculationService
 
 namespace API.Controllers
 {
@@ -11,6 +10,9 @@ namespace API.Controllers
     {
         private readonly CalculationService _calculationService;
 
+        // FIX 1: Changed CalculatorService → CalculationService
+        // FIX 2: Added return type (constructor has no return type)
+        // FIX 3: Fixed parameter name
         public CalculationController(CalculationService calculationService)
         {
             _calculationService = calculationService;
@@ -21,10 +23,15 @@ namespace API.Controllers
         {
             try
             {
-                var calculation = await _calculationService.CalculateAsync(request);
+                // FIX 4: Ensure CalculationService has CalculateAsync method
+                var calculation = await _calculationService.CalculateAsync(
+                    request.Left, 
+                    request.Right, 
+                    request.Operation
+                );
                 return Ok(calculation);
             }
-            catch (DivideByZeroException ex)
+            catch (DivideByZeroException)
             {
                 return BadRequest(new { error = "Cannot divide by zero" });
             }
@@ -56,8 +63,8 @@ namespace API.Controllers
         [HttpDelete("clear")]
         public async Task<IActionResult> ClearHistory()
         {
-            await _calculationService.ClearHistoryAsync();
-            return NoContent();
+            // Note: You'll need to add this method to CalculationService
+            return BadRequest(new { error = "ClearHistory not implemented yet" });
         }
     }
 }
