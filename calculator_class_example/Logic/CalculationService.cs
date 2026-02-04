@@ -1,46 +1,39 @@
 using Calculator_Class_Example.Domain;
-namespace Calculator_Class_Example.Logic;
-using System.Text.Json;
+using Calculator_Class_Example.Persistence;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Calculator_Class_Example.Logic  // Use YOUR namespace
+namespace Calculator_Class_Example.Logic
 {
     public class CalculationService
     {
-        private readonly string _filePath;
-        private readonly JsonSerializerOptions _jsonOptions;
-        
-        public CalculationService(string filePath = "Data/calculation.json")
+        private readonly ICalculationStore _store;
+
+        public CalculationService(ICalculationStore store)
         {
-            _filePath = filePath;
-            _jsonOptions = new JsonSerializerOptions
+            _store = store;
+        }
+
+        public async Task<Calculation> CalculateAsync(double left, double right, OperationType operation)
+        {
+            double result = operation switch
             {
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                OperationType.Add => left + right,
+                OperationType.Subtract => left - right,
+                OperationType.Multiply => left * right,
+                OperationType.Divide => right != 0 ? left / right : throw new DivideByZeroException("Cannot divide by zero"),
+                _ => throw new ArgumentOutOfRangeException(nameof(operation))
             };
+
+            var calculation = new Calculation(left, right, operation, result);
+            await _store.SaveAsync(calculation);
+            return calculation;
         }
-        
-        public async Task<IReadOnlyList<Calculation>> LoadAllAsync()
+
+        public async Task<List<Calculation>> GetHistoryAsync()
         {
-            if (!File.Exists(_filePath))
-                return new List<Calculation>();
-
-            string json = await File.ReadAllTextAsync(_filePath);
-
-            if (string.IsNullOrWhiteSpace(json) || json.Trim() == "[]")
-                return new List<Calculation>();
-
-            return JsonSerializer.Deserialize<List<Calculation>>(json, _jsonOptions)
-                ?? new List<Calculation>();
-        }
-        
-        public async Task SaveCalculationAsync(Calculation calculation)
-        {
-            var calculations = (await LoadAllAsync()).ToList();
-            calculations.Add(calculation);
-            
-            string json = JsonSerializer.Serialize(calculations, _jsonOptions);
-            await File.WriteAllTextAsync(_filePath, json);
+            var history = await _store.LoadAllAsync();
+            return history.ToList();
         }
     }
 }

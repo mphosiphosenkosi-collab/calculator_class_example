@@ -23,8 +23,8 @@ builder.Services.AddEndpointsApiExplorer();  // Required for Swagger
 builder.Services.AddSwaggerGen();
 
 // Register FileCalculationStore as singleton with the correct path
-builder.Services.AddSingleton<ICalculationStore>(provider =>
-    new FileCalculationStore(jsonFilePath));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Register CalculationService as singleton
 
