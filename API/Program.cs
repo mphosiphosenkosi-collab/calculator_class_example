@@ -1,8 +1,16 @@
+using Microsoft.AspNetCore.Builder;
+using System.Net;
+using Calculator_Class_Example.API.Middleware;
+
 using Calculator_Class_Example.Domain;
 using Calculator_Class_Example.Persistence;
 using Calculator_Class_Example.Logic;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var app = builder.Build();
+
+var app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Build the correct data directory path
 var dataDirectory = Path.Combine(
